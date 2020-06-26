@@ -1,28 +1,4 @@
-#Helper Matrix Functions
-def printMatrix(matrix):
-    """
-    Prints a matrix (list of lists) in a readable format
-    For debugging purposes only
-    """
-    txt = "["
-    height = len(matrix)
-    for i in range(height):
-        row = str(matrix[i])
-        if i > 0:
-            row = " "+row
-        txt += row
-        if i < height-1:
-            txt += "\n"
-    print(txt+"]")
-
-def createBlankSquareMatrix(size):
-    """
-    Returns a blank square matrix (list of lists) where all the elements are None
-    """
-    mat = []
-    for i in range(size):
-        mat.append([None]*size)
-    return mat
+import matrix
 
 #Similiarity functions
 def directConnect(node0,node1,AdjacenyMatrix):
@@ -50,40 +26,22 @@ def randomWalk(node0,node1,AdjacenyMatrix):
     pass
 
 #Similarity Matrix generators
-def getDirectedSimiliarityMatrix(AdjacenyMatrix,similiarityFunction):
+def getSimiliarityMatrix(AdjacenyMatrix,similiarityFunction,directed=False):
     """
-    Returns a similiarity matrix of a given DIRECTED AdjacenyMatrix.
+    Returns a similiarity matrix of a given AdjacenyMatrix.
     """
     size = len(AdjacenyMatrix)
     #Create Blank Similiarity Matrix
-    similarityMatrix = createBlankSquareMatrix(size)
+    similarityMatrix = matrix.BlankSquareMatrix(size)
     #Populate similiarty Matrix appropriately
     for y in range(size):
-        for x in range(size):
+        for x in range(0 if directed else y,size):
             if x == y:
                 #Identical nodes have similiart of 1
-                similarityMatrix[x][y] == 1
+                similarityMatrix[x][y] = 1
             else:
-                #Calculate similiarity for node pairs
-                similarity = similiarityFunction(x,y,AdjacenyMatrix)
-                similarityMatrix[y][x] = similarity
-                similarityMatrix[x][y] = similarity
-    return similarityMatrix
-
-def getUndirectedSimiliarityMatrix(AdjacenyMatrix,similiarityFunction):
-    """
-    Returns a similiarity matrix of a given DIRECTED AdjacenyMatrix.
-    """
-    size = len(AdjacenyMatrix)
-    #Create Blank Similiarity Matrix
-    similarityMatrix = createBlankSquareMatrix(size)
-    #Populate similiarty Matrix appropriately
-    for y in range(size):
-        #Similiarity between the same nodes will be 1
-        similarityMatrix[y][y] = 1
-        #Calculate similiarity for other nodes
-        for x in range(y+1,size):
-            similarity = similiarityFunction(x,y,AdjacenyMatrix)
-            similarityMatrix[y][x] = similarity
-            similarityMatrix[x][y] = similarity
-    return similarityMatrix
+                #Generate Random Edge weight
+                similarityMatrix[y][x] = similiarityFunction(x,y,AdjacenyMatrix)
+                if directed == False:
+                    adjacenyMatrix[x][y] = adjacenyMatrix[y][x]
+    return adjacenyMatrix
