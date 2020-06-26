@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+import matplotlib.pyplot as plt
 #Internal modules
 import similarity
 import graphs
@@ -52,7 +53,7 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
-        if i % 100 == 0:
+        if (i/max_steps*100) % 10 == 0:
             average_loss = sum(loss_list)/len(loss_list)
             loss_list = []
             print("Loss:",average_loss)
@@ -61,13 +62,33 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10
                 break
     return encoder
 
+#Display Function
 def Display(adjacenyMatrix,encoder):
+    #Print matrix
+    matrix.printMat(adjacenyMatrix)
+    #Plot latent space
     adjacenyTensor = torch.Tensor(adjacenyMatrix)
     latentMapping = encoder(adjacenyTensor).tolist()
+    X = list()
+    Y = list()
     for node in range(len(adjacenyMatrix)):
         (x,y) = latentMapping[node]
+        X.append(x)
+        Y.append(y)
         print(f"Node: {node} -> ({x},{y})")
-
-graph = graphs.randomGraph(3)
+    #Plot Nodes
+    plt.plot(X, Y, 'ro')
+    #plt.axis([0, 1, 0, 1])
+    #Draw edges
+    for n in range(len(adjacenyMatrix)):
+        row = adjacenyMatrix[n]
+        point0 = latentMapping[n]
+        for neigh in range(len(row)):
+            point1 = latentMapping[neigh]
+            x_values = [point0[0], point1[0]]
+            y_values = [point0[1], point1[1]]
+            plt.plot(x_values, y_values, color='k', alpha=adjacenyMatrix[n][neigh])
+    plt.show()
+graph = graphs.randomGraph(5,weighted=True)
 encoder = CreateEncoder(graph)
 Display(graph,encoder)
