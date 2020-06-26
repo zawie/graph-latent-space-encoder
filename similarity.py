@@ -87,5 +87,3 @@ def getUndirectedSimiliarityMatrix(AdjacenyMatrix,similiarityFunction):
             similarityMatrix[y][x] = similarity
             similarityMatrix[x][y] = similarity
     return similarityMatrix
-
-printMatrix(getUndirectedSimiliarityMatrix([[1,1,1,0],[1,1,0,0],[1,0,1,0],[0,0,0,1]],sharedNeighbors))
