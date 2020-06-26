@@ -15,11 +15,32 @@ def printMat(matrix):
             txt += "\n"
     print(txt+"]")
 
-def BlankSquareMatrix(size):
+def squareMatrix(size,value=None):
     """
     Returns a blank square matrix (list of lists) where all the elements are None
     """
     mat = []
     for i in range(size):
-        mat.append([None]*size)
+        mat.append([value]*size)
     return mat
+
+def vectorDistance(u,v):
+    """
+    Returns the distance between two vectors
+    """
+    assert(len(u) == len(v))
+    n = len(u)
+    total = 0
+    for i in range(n):
+        total += (u[i] - v[i])**2
+    return total**(1/2)
+
+def distanceMatrix(matrix):
+    n = len(matrix)
+    distanceMatrix = squareMatrix(n)
+    for i in range(n):
+        v0 = matrix[i]
+        for j in range(n):
+            v1 = matrix[j]
+            distanceMatrix[i][j] = vectorDistance(v0,v1)
+    return distanceMatrix
