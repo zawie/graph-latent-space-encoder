@@ -13,23 +13,35 @@ import matrix
 class SimpleEncoder(nn.Module):
     def __init__(self, input_size, output_size):
         super(SimpleEncoder,self).__init__()
-        self.fc1 = nn.Linear(input_size,output_size)
+        self.fc1 = nn.Linear(input_size,output_size,bias=False)
         self.sigmoid = nn.Sigmoid()
     def forward(self,x):
         x = self.fc1(x)
         x = self.sigmoid(x)
         return x
 
-#Custom Loss
-def my_loss(output, similarityTensor):
-    #print("Running Loss!")
-    #print("Output:",output.size())
+#Custom Losses
+def latent_orthogonality_loss(output, similarityTensor):
+    #Latent Orthoganlity
     outputT = torch.transpose(output,0,1)
-    #print("Output Transpose:",outputT.size())
-    latentDistance = torch.mm(output,outputT)
-    #print("Latent Distance:",latentDistance.size())
-    #print("Similarity Tensor:",similarityTensor.size())
-    loss = torch.mean((latentDistance - similarityTensor)**2)
+    latentOrthogonality = torch.mm(output,outputT)
+    loss = torch.mean((latentOrthogonality - similarityTensor)**2)
+    return loss
+
+def latent_distance_loss(output, similarityTensor):
+    #Latent Orthoganlity
+    size = output.size()[0]
+
+    n = output.size(0)
+    m = output.size(0)
+    d = output.size(1)
+
+    x = output.unsqueeze(1).expand(n, m, d)
+    y = output.unsqueeze(0).expand(n, m, d)
+
+    dist = torch.pow(x - y, 2).sum(2)
+
+    loss = torch.mean(((1 - dist) - similarityTensor)**2)
     return loss
 
 #Creater function
@@ -41,7 +53,7 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10
     encoder = model(len(adjacenyMatrix),output_size)
     #Define optimizer & Criterion
     optimizer = optim.Adam(encoder.parameters(), lr=0.001)
-    criterion = my_loss
+    criterion = latent_distance_loss
     loss_list = list()
     for i in range(max_steps):
         #zero gradient
@@ -89,6 +101,7 @@ def Display(adjacenyMatrix,encoder):
             y_values = [point0[1], point1[1]]
             plt.plot(x_values, y_values, color='k', alpha=adjacenyMatrix[n][neigh])
     plt.show()
-graph = graphs.randomGraph(5,weighted=True)
+
+graph = graphs.randomGraph(20,weighted=True)
 encoder = CreateEncoder(graph)
 Display(graph,encoder)
