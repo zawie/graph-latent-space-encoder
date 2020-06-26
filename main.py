@@ -32,11 +32,11 @@ def my_loss(output, similarityTensor):
     return loss
 
 #Creater function
-def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=100000):
+def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10000):
     #Generate Similairty Matrix
     similarityTensor = torch.Tensor(similarity.getSimilarityMatrix(adjacenyMatrix))
     #training cycle
-    batch = torch.Tensor(adjacenyMatrix)
+    adjacenyTensor = torch.Tensor(adjacenyMatrix)
     encoder = model(len(adjacenyMatrix),output_size)
     #Define optimizer & Criterion
     optimizer = optim.Adam(encoder.parameters(), lr=0.001)
@@ -46,13 +46,13 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10
         #zero gradient
         optimizer.zero_grad()
         #forward, backward, optimize
-        output = encoder(batch)
+        output = encoder(adjacenyTensor)
         #print("Output:",output)
         loss = criterion(output,similarityTensor)
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
-        if i % 10000 == 0:
+        if i % 100 == 0:
             average_loss = sum(loss_list)/len(loss_list)
             loss_list = []
             print("Loss:",average_loss)
@@ -61,5 +61,13 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10
                 break
     return encoder
 
+def Display(adjacenyMatrix,encoder):
+    adjacenyTensor = torch.Tensor(adjacenyMatrix)
+    latentMapping = encoder(adjacenyTensor).tolist()
+    for node in range(len(adjacenyMatrix)):
+        (x,y) = latentMapping[node]
+        print(f"Node: {node} -> ({x},{y})")
+
 graph = graphs.randomGraph(3)
 encoder = CreateEncoder(graph)
+Display(graph,encoder)
