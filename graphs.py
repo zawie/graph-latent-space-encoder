@@ -5,7 +5,7 @@ def randomGraph(nodeCount,weighted=False,directed=False):
     """
     Generates and returns a random adjaceny matrix
     """
-    adjacenyMatrix = matrix.BlankSquareMatrix(nodeCount)
+    adjacenyMatrix = matrix.squareMatrix(nodeCount)
     for y in range(nodeCount):
         for x in range(0 if directed else y,nodeCount):
             if x == y:

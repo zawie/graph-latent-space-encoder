@@ -32,7 +32,7 @@ def getSimilarityMatrix(AdjacenyMatrix,similarityFunction=sharedNeighbors,direct
     """
     size = len(AdjacenyMatrix)
     #Create Blank Similiarity Matrix
-    similarityMatrix = matrix.BlankSquareMatrix(size)
+    similarityMatrix = matrix.squareMatrix(size)
     #Populate similiarty Matrix appropriately
     for y in range(size):
         for x in range(0 if directed else y,size):
