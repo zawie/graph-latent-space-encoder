@@ -26,7 +26,7 @@ def randomWalk(node0,node1,AdjacenyMatrix):
     pass
 
 #Similarity Matrix generators
-def getSimiliarityMatrix(AdjacenyMatrix,similiarityFunction,directed=False):
+def getSimilarityMatrix(AdjacenyMatrix,similarityFunction=sharedNeighbors,directed=False):
     """
     Returns a similiarity matrix of a given AdjacenyMatrix.
     """
@@ -41,7 +41,7 @@ def getSimiliarityMatrix(AdjacenyMatrix,similiarityFunction,directed=False):
                 similarityMatrix[x][y] = 1
             else:
                 #Generate Random Edge weight
-                similarityMatrix[y][x] = similiarityFunction(x,y,AdjacenyMatrix)
+                similarityMatrix[y][x] = similarityFunction(x,y,AdjacenyMatrix)
                 if directed == False:
-                    adjacenyMatrix[x][y] = adjacenyMatrix[y][x]
-    return adjacenyMatrix
+                    similarityMatrix[x][y] = similarityMatrix[y][x]
+    return similarityMatrix

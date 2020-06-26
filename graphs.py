@@ -26,7 +26,6 @@ def readGraph(fileName):
 
 def KarateClub():
     return readGraph("KaraClub")
+
 def SocialNetwork():
     return readGraph("SocialNetwork")
-
-matrix.printMat(randomGraph(10))
