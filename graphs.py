@@ -1,6 +1,17 @@
 import random
 import matrix
 
+#Pre-made graphs
+def readGraph(fileName):
+    """
+    Returns the adajency matrix of a given graph stored at data/file_name
+    """
+    pass
+
+def KarateClub():
+    return readGraph("KaraClub")
+
+#Random graphs
 def Random(nodeCount,weighted=False,directed=False):
     """
     Generates and returns a random adjaceny matrix
@@ -18,19 +29,7 @@ def Random(nodeCount,weighted=False,directed=False):
                     adjacenyMatrix[x][y] = adjacenyMatrix[y][x]
     return adjacenyMatrix
 
-def readGraph(fileName):
-    """
-    Returns the adajency matrix of a given graph stored at data/file_name
-    """
-    pass
-
-def KarateClub():
-    return readGraph("KaraClub")
-
-def SocialNetwork():
-    return readGraph("SocialNetwork")
-
-
+#Cycle Structures
 def Cycle(nodeCount):
     adjacenyMatrix = matrix.squareMatrix(nodeCount,value=0)
     for n in range(nodeCount):
@@ -62,6 +61,7 @@ def DoubleCrossedCycle(nodeCount):
 def Connected(nodeCount):
     return matrix.squareMatrix(nodeCount,value=1)
 
+#Molecules
 def Benzine(Hydrogen=True):
     #Create base carbon center
     mat = Cycle(6)
