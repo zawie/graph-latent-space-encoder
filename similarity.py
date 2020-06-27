@@ -23,7 +23,7 @@ def sharedNeighbors(node0,node1,AdjacenyMatrix):
     #Return average sharedness
     return total/size
 
-def randomWalk(root,AdjacenyMatrix,steps=100,walks=100):
+def randomWalk(root,AdjacenyMatrix,steps=100,walks=10):
     """
     Does a random walk through graph to determiante similarity between two nodes
     """

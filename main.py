@@ -3,11 +3,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import matplotlib.pyplot as plt
 #Internal modules
 import similarity
 import graphs
 import matrix
+import display
 
 #Encoders
 class SimpleEncoder(nn.Module):
@@ -76,49 +76,7 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
                 break
     return encoder
 
-#Display Function
-def Display2D(adjacenyMatrix,latentMapping):
-    #Plot latent space
-    X = list()
-    Y = list()
-    for node in range(len(adjacenyMatrix)):
-        (x,y) = latentMapping[node]
-        X.append(x)
-        Y.append(y)
-    #Plot Nodes
-    plt.plot(X, Y, 'ro')
-    #plt.axis([0, 1, 0, 1])
-    #Draw edges
-    for n in range(len(adjacenyMatrix)):
-        row = adjacenyMatrix[n]
-        point0 = latentMapping[n]
-        for neigh in range(len(row)):
-            point1 = latentMapping[neigh]
-            x_values = [point0[0], point1[0]]
-            y_values = [point0[1], point1[1]]
-            plt.plot(x_values, y_values, color='k', alpha=adjacenyMatrix[n][neigh]*.5)
-    plt.show()
-def Display3D(adjacenyMatrix,encoder):
-    pass
-def Display(adjacenyMatrix,encoder,doPrint=True):
-    adjacenyTensor = torch.Tensor(adjacenyMatrix)
-    latentMapping = encoder(adjacenyTensor).tolist()
-    if doPrint:
-        #Print matrix
-        matrix.printMat(adjacenyMatrix)
-        #Print latent mapping
-        for node in range(len(latentMapping)):
-            vector =  latentMapping[node]
-            print(f"Node{node} -> {vector}")
-    dimension = encoder.output_size
-    if dimension == 2:
-        Display2D(adjacenyMatrix,latentMapping)
-    elif dimension== 3:
-        Display3D(adjacenyMatrix,latentMapping)
-    else:
-        print("Unable to plot {dimension}-dimensional figure!")
-
 #Call
 graph = graphs.randomGraph(10,weighted=True)
-encoder = CreateEncoder(graph,similarity_function=similarity.randomWalk)
-Display(graph,encoder)
+encoder = CreateEncoder(graph,output_size=3,similarity_function=similarity.randomWalk)
+display.Plot(graph,encoder)
