@@ -19,31 +19,33 @@ class SimpleEncoder(nn.Module):
         self.input_size = input_size
         self.output_size = output_size
         self.fc1 = nn.Linear(input_size,output_size,bias=False)
-        self.sigmoid = nn.Sigmoid()
+        self.activation = nn.Tanh()
     def forward(self,x):
         x = self.fc1(x)
-        x = self.sigmoid(x)
+        x = self.activation(x)
         return x
 
 #Custom Losses
 def latent_orthogonality_loss(output, similarityTensor):
     """
     This will make more similar nodes more parallel, and more disimilar nodes
-    more orthogonal.
-
-    This is better for capturing information (I think), but not as pretty.
+        more orthogonal.
+    This is better for capturing information (I think), but not as visualling
+        appealing.
     """
     outputT = torch.transpose(output,0,1)
     latentOrthogonality = torch.mm(output,outputT)
     loss = torch.mean((latentOrthogonality - similarityTensor)**2)
     return loss
 
-def latent_distance_loss(output, similarityTensor):
+def latent_distance_loss(output, similarityTensor, pushback=0.1):
     """
     This will make more similar nodes closer to each other and disimilar nodes
     farther from each other in the latent space, using Euclidian Distance.
 
     This is more useful for visualizing.
+
+    Pushback adds an additonal "pressure" from nodes being plotted too close
     """
     size = output.size()[0]
     n = output.size(0)
@@ -52,14 +54,24 @@ def latent_distance_loss(output, similarityTensor):
     x = output.unsqueeze(1).expand(n, m, d)
     y = output.unsqueeze(0).expand(n, m, d)
     dist = torch.pow(x - y, 2).sum(2)
-    loss = torch.mean(((1 - dist) - similarityTensor)**2)
+    loss = torch.mean((( (1-pushback) - dist) - similarityTensor)**2)
+    return loss
+
+def mixed_loss(output, similarityTensor):
+    """
+    Means latent distance and orthogonality for good looking results
+    """
+    ortho = latent_orthogonality_loss(output, similarityTensor)
+    dist = latent_distance_loss(output, similarityTensor)
+    loss = torch.mean(ortho+dist)
     return loss
 
 #Creater function
 def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=10000):
     """
     This will train and return a specified model on a specific graph.
-    The encoder will assign nodes vectors in a latent space of a specified dimension (output_size)
+    The encoder will assign nodes vectors in a latent space of a specified
+        dimension (output_size)
     """
     #Generate Similairty Matrix
     similarityTensor = torch.Tensor(similarity.getSimilarityMatrix(adjacenyMatrix,similarity_function))
@@ -68,7 +80,7 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
     encoder = model(len(adjacenyMatrix),output_size)
     #Define optimizer & Criterion
     optimizer = optim.Adam(encoder.parameters(), lr=0.001, weight_decay=1e-9)
-    criterion = latent_distance_loss
+    criterion = mixed_loss
     loss_list = list()
     last_loss = None
     for i in range(max_steps):
@@ -92,6 +104,6 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
     return encoder,last_loss
 
 #Call
-graph = graphs.DoubleCrossedCycle(12)
+graph = graphs.DoubleCrossedCycle(16)
 encoder,loss = CreateEncoder(graph,output_size=3,similarity_function=similarity.directConnections)
 display.Plot(graph,encoder)

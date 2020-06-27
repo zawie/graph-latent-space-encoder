@@ -9,7 +9,7 @@ def readGraph(fileName):
     pass
 
 def KarateClub():
-    return readGraph("KaraClub")
+    return readGraph("KarateClub")
 
 #Random graphs
 def Random(nodeCount,weighted=False,directed=False):
@@ -29,18 +29,28 @@ def Random(nodeCount,weighted=False,directed=False):
                     adjacenyMatrix[x][y] = adjacenyMatrix[y][x]
     return adjacenyMatrix
 
-#Cycle Structures
-def Cycle(nodeCount):
+#Snakes
+def Snake(nodeCount):
     adjacenyMatrix = matrix.squareMatrix(nodeCount,value=0)
     for n in range(nodeCount):
         adjacenyMatrix[n][n] = 1
         if n+1 < nodeCount:
             adjacenyMatrix[n][n+1] = 1
             adjacenyMatrix[n+1][n] = 1
-        else:
-            adjacenyMatrix[n][0] = 1
-            adjacenyMatrix[0][n] = 1
-    return(adjacenyMatrix)
+    return adjacenyMatrix
+
+def DoubleCrossSnake(nodeCount):
+    pass
+
+def TripleCrossSnake(nodeCount):
+    pass
+
+#Cycle Structures
+def Cycle(nodeCount):
+    adjacenyMatrix = Snake(nodeCount)
+    adjacenyMatrix[nodeCount-1][0] = 1
+    adjacenyMatrix[0][nodeCount-1] = 1
+    return adjacenyMatrix
 
 def CrossedCycle(nodeCount):
     mat = Cycle(nodeCount)
