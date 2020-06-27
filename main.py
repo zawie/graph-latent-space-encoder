@@ -120,5 +120,5 @@ def Display(adjacenyMatrix,encoder,doPrint=True):
 
 #Call
 graph = graphs.randomGraph(10,weighted=True)
-encoder = CreateEncoder(graph,similarity_function=similarity.directConnections)
+encoder = CreateEncoder(graph,similarity_function=similarity.randomWalk)
 Display(graph,encoder)

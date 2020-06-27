@@ -1,4 +1,5 @@
 import matrix
+from numpy.random import choice
 
 #Similiarity functions
 def directConnections(node0,node1,AdjacenyMatrix):
@@ -22,8 +23,18 @@ def sharedNeighbors(node0,node1,AdjacenyMatrix):
     #Return average sharedness
     return total/size
 
-def randomWalk(node0,node1,AdjacenyMatrix):
-    pass
+def randomWalk(node0,node1,AdjacenyMatrix,steps=100,walks=10):
+    visits = [0]*len(AdjacenyMatrix)
+    for w in range(walks):
+        pos = node0
+        for s in range(steps):
+            options = list(range(len(AdjacenyMatrix)))
+            options.pop(pos)
+            distribution = AdjacenyMatrix[pos]/sum(AdjacenyMatrix[pos])
+            next_node = choice(options, 1, p=distribution)[0]
+            visits[next_node] += 1
+            pos = next_node
+    return visits[node1]/sum(visits)
 
 #Similarity Matrix generators
 def getSimilarityMatrix(AdjacenyMatrix,similarityFunction=sharedNeighbors,directed=False):
