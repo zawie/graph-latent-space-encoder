@@ -29,3 +29,16 @@ def KarateClub():
 
 def SocialNetwork():
     return readGraph("SocialNetwork")
+
+
+def Cycle(nodeCount):
+    adjacenyMatrix = matrix.squareMatrix(nodeCount,value=0)
+    for n in range(nodeCount):
+        adjacenyMatrix[n][n] = 1
+        if n+1 < nodeCount:
+            adjacenyMatrix[n][n+1] = 1
+            adjacenyMatrix[n+1][n] = 1
+        else:
+            adjacenyMatrix[n][0] = 1
+            adjacenyMatrix[0][n] = 1
+    return(adjacenyMatrix)

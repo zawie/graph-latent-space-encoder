@@ -56,7 +56,7 @@ def latent_distance_loss(output, similarityTensor):
     return loss
 
 #Creater function
-def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=10000):
+def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=100000):
     """
     This will train and return a specified model on a specific graph.
     The encoder will assign nodes vectors in a latent space of a specified dimension (output_size)
@@ -67,9 +67,10 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
     adjacenyTensor = torch.Tensor(adjacenyMatrix)
     encoder = model(len(adjacenyMatrix),output_size)
     #Define optimizer & Criterion
-    optimizer = optim.Adam(encoder.parameters(), lr=0.001)
+    optimizer = optim.Adam(encoder.parameters(), lr=0.001, weight_decay=1e-5)
     criterion = latent_distance_loss
     loss_list = list()
+    last_loss = None
     for i in range(max_steps):
         #zero gradient
         optimizer.zero_grad()
@@ -80,6 +81,7 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
         loss.backward()
         optimizer.step()
         loss_list.append(loss.item())
+        last_loss = loss.item()
         if (i/max_steps*100) % 10 == 0:
             average_loss = sum(loss_list)/len(loss_list)
             loss_list = []
@@ -87,9 +89,9 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
             if average_loss < 1e-9:
                 print(f"Early Break! [{i}/{max_steps}]")
                 break
-    return encoder
+    return encoder,last_loss
 
 #Call
-graph = graphs.randomGraph(10,weighted=False)
-encoder = CreateEncoder(graph,output_size=3,similarity_function=similarity.randomWalk)
+graph = graphs.Cycle(10)
+encoder,loss = CreateEncoder(graph,output_size=2,similarity_function=similarity.randomWalk)
 display.Plot(graph,encoder)
