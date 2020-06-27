@@ -23,22 +23,23 @@ def sharedNeighbors(node0,node1,AdjacenyMatrix):
     #Return average sharedness
     return total/size
 
-def randomWalk(node0,node1,AdjacenyMatrix,steps=100,walks=10):
+def randomWalk(root,AdjacenyMatrix,walks=100):
     """
     Does a random walk through graph to determiante similarity between two nodes
     """
     visits = [0]*len(AdjacenyMatrix)
+    steps = len(AdjacenyMatrix)**2
     for w in range(walks):
-        pos = node0
+        pos = root
         for s in range(steps):
             options = list(range(len(AdjacenyMatrix)))
             distribution = list(AdjacenyMatrix[pos])
-            distribution[node0] = 0
+            distribution[root] = 0
             distribution = [x / sum(distribution) for x in distribution]
             next_node = choice(options, 1, p=distribution)[0]
             visits[next_node] += 1
             pos = next_node
-    return visits[node1]/sum(visits)
+    return [v / sum(visits) for v in visits]
 
 #Similarity Matrix generators
 def getSimilarityMatrix(AdjacenyMatrix,similarityFunction=sharedNeighbors,directed=False):
@@ -46,17 +47,27 @@ def getSimilarityMatrix(AdjacenyMatrix,similarityFunction=sharedNeighbors,direct
     Returns a similiarity matrix of a given AdjacenyMatrix.
     """
     size = len(AdjacenyMatrix)
-    #Create Blank Similiarity Matrix
-    similarityMatrix = matrix.squareMatrix(size)
-    #Populate similiarty Matrix appropriately
-    for y in range(size):
-        for x in range(0 if directed else y,size):
-            if x == y:
-                #Identical nodes have similiart of 1
-                similarityMatrix[x][y] = 1
-            else:
-                #Generate Random Edge weight
-                similarityMatrix[y][x] = similarityFunction(x,y,AdjacenyMatrix)
-                if directed == False:
-                    similarityMatrix[x][y] = similarityMatrix[y][x]
+    similarityMatrix = list()
+    if similarityFunction == randomWalk:
+        #Do a random walk for each node to determine similiarity
+        for node in range(size):
+            row = randomWalk(node,AdjacenyMatrix)
+            similarityMatrix.append(row)
+        #Make diagonal all ones
+        for i in range(size):
+            similarityMatrix[i][i] = 1
+    else:
+        #Create Blank Similiarity Matrix
+        similarityMatrix = matrix.squareMatrix(size)
+        #Populate similiarty Matrix appropriately
+        for y in range(size):
+            for x in range(0 if directed else y,size):
+                if x == y:
+                    #Identical nodes have similiart of 1
+                    similarityMatrix[x][y] = 1
+                else:
+                    #Generate Random Edge weight
+                    similarityMatrix[y][x] = similarityFunction(x,y,AdjacenyMatrix)
+                    if directed == False:
+                        similarityMatrix[x][y] = similarityMatrix[y][x]
     return similarityMatrix
