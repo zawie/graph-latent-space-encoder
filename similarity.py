@@ -23,22 +23,23 @@ def sharedNeighbors(node0,node1,AdjacenyMatrix):
     #Return average sharedness
     return total/size
 
-def randomWalk(root,AdjacenyMatrix,walks=100):
+def randomWalk(root,AdjacenyMatrix,steps=100,walks=100):
     """
     Does a random walk through graph to determiante similarity between two nodes
     """
     visits = [0]*len(AdjacenyMatrix)
-    steps = len(AdjacenyMatrix)**2
     for w in range(walks):
         pos = root
         for s in range(steps):
             options = list(range(len(AdjacenyMatrix)))
             distribution = list(AdjacenyMatrix[pos])
-            distribution[root] = 0
+            distribution[pos] = 0
             distribution = [x / sum(distribution) for x in distribution]
             next_node = choice(options, 1, p=distribution)[0]
             visits[next_node] += 1
             pos = next_node
+    visits[root] = 0
+    print( [int(100*v / sum(visits)) for v in visits] )
     return [v / sum(visits) for v in visits]
 
 #Similarity Matrix generators
@@ -51,7 +52,7 @@ def getSimilarityMatrix(AdjacenyMatrix,similarityFunction=sharedNeighbors,direct
     if similarityFunction == randomWalk:
         #Do a random walk for each node to determine similiarity
         for node in range(size):
-            row = randomWalk(node,AdjacenyMatrix)
+            row = randomWalk(node,AdjacenyMatrix,steps=size**2)
             similarityMatrix.append(row)
         #Make diagonal all ones
         for i in range(size):
