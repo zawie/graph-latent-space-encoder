@@ -24,13 +24,17 @@ def sharedNeighbors(node0,node1,AdjacenyMatrix):
     return total/size
 
 def randomWalk(node0,node1,AdjacenyMatrix,steps=100,walks=10):
+    """
+    Does a random walk through graph to determiante similarity between two nodes
+    """
     visits = [0]*len(AdjacenyMatrix)
     for w in range(walks):
         pos = node0
         for s in range(steps):
             options = list(range(len(AdjacenyMatrix)))
-            options.pop(pos)
-            distribution = AdjacenyMatrix[pos]/sum(AdjacenyMatrix[pos])
+            distribution = list(AdjacenyMatrix[pos])
+            distribution[node0] = 0
+            distribution = [x / sum(distribution) for x in distribution]
             next_node = choice(options, 1, p=distribution)[0]
             visits[next_node] += 1
             pos = next_node

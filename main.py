@@ -49,7 +49,7 @@ def latent_distance_loss(output, similarityTensor):
 #Creater function
 def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=10000):
     #Generate Similairty Matrix
-    similarityTensor = torch.Tensor(similarity.getSimilarityMatrix(adjacenyMatrix))
+    similarityTensor = torch.Tensor(similarity.getSimilarityMatrix(adjacenyMatrix,similarity_function))
     #training cycle
     adjacenyTensor = torch.Tensor(adjacenyMatrix)
     encoder = model(len(adjacenyMatrix),output_size)
