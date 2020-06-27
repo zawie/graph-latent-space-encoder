@@ -1,7 +1,7 @@
 import matrix
 
 #Similiarity functions
-def directConnect(node0,node1,AdjacenyMatrix):
+def directConnections(node0,node1,AdjacenyMatrix):
     """
     Return a ratio between 0 and 1 representing how connected the nodes are
     """

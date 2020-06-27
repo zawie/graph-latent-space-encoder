@@ -13,6 +13,8 @@ import matrix
 class SimpleEncoder(nn.Module):
     def __init__(self, input_size, output_size):
         super(SimpleEncoder,self).__init__()
+        self.input_size = input_size
+        self.output_size = output_size
         self.fc1 = nn.Linear(input_size,output_size,bias=False)
         self.sigmoid = nn.Sigmoid()
     def forward(self,x):
@@ -45,7 +47,7 @@ def latent_distance_loss(output, similarityTensor):
     return loss
 
 #Creater function
-def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10000):
+def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=10000):
     #Generate Similairty Matrix
     similarityTensor = torch.Tensor(similarity.getSimilarityMatrix(adjacenyMatrix))
     #training cycle
@@ -75,19 +77,14 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder, output_size=2,max_steps=10
     return encoder
 
 #Display Function
-def Display(adjacenyMatrix,encoder):
-    #Print matrix
-    matrix.printMat(adjacenyMatrix)
+def Display2D(adjacenyMatrix,latentMapping):
     #Plot latent space
-    adjacenyTensor = torch.Tensor(adjacenyMatrix)
-    latentMapping = encoder(adjacenyTensor).tolist()
     X = list()
     Y = list()
     for node in range(len(adjacenyMatrix)):
         (x,y) = latentMapping[node]
         X.append(x)
         Y.append(y)
-        print(f"Node: {node} -> ({x},{y})")
     #Plot Nodes
     plt.plot(X, Y, 'ro')
     #plt.axis([0, 1, 0, 1])
@@ -99,9 +96,29 @@ def Display(adjacenyMatrix,encoder):
             point1 = latentMapping[neigh]
             x_values = [point0[0], point1[0]]
             y_values = [point0[1], point1[1]]
-            plt.plot(x_values, y_values, color='k', alpha=adjacenyMatrix[n][neigh])
+            plt.plot(x_values, y_values, color='k', alpha=adjacenyMatrix[n][neigh]*.5)
     plt.show()
+def Display3D(adjacenyMatrix,encoder):
+    pass
+def Display(adjacenyMatrix,encoder,doPrint=True):
+    adjacenyTensor = torch.Tensor(adjacenyMatrix)
+    latentMapping = encoder(adjacenyTensor).tolist()
+    if doPrint:
+        #Print matrix
+        matrix.printMat(adjacenyMatrix)
+        #Print latent mapping
+        for node in range(len(latentMapping)):
+            vector =  latentMapping[node]
+            print(f"Node{node} -> {vector}")
+    dimension = encoder.output_size
+    if dimension == 2:
+        Display2D(adjacenyMatrix,latentMapping)
+    elif dimension== 3:
+        Display3D(adjacenyMatrix,latentMapping)
+    else:
+        print("Unable to plot {dimension}-dimensional figure!")
 
-graph = graphs.randomGraph(20,weighted=True)
-encoder = CreateEncoder(graph)
+#Call
+graph = graphs.randomGraph(10,weighted=True)
+encoder = CreateEncoder(graph,similarity_function=similarity.directConnections)
 Display(graph,encoder)
