@@ -43,6 +43,21 @@ def Cycle(nodeCount):
             adjacenyMatrix[0][n] = 1
     return(adjacenyMatrix)
 
+def CrossedCycle(nodeCount):
+    mat = Cycle(nodeCount)
+    mat[0][nodeCount//2] = 1
+    mat[nodeCount//2][0] = 1
+    return mat
+
+def DoubleCrossedCycle(nodeCount):
+    mat = Cycle(nodeCount)
+    #First Cross
+    mat[0][nodeCount//2] = 1
+    mat[nodeCount//2][0] = 1
+    #Second Cross
+    mat[nodeCount//4][nodeCount//2+nodeCount//4] = 1
+    mat[nodeCount//2+nodeCount//4][nodeCount//4] = 1
+    return mat
 
 def Connected(nodeCount):
     return matrix.squareMatrix(nodeCount,value=1)
@@ -60,11 +75,11 @@ def Benzine(Hydrogen=True):
         #Add Hydrogens
         for i in range(6):
             #Add Hydrogden to existing rows
-            additional = [-1]*6
+            additional = [0]*6
             additional[i] = 1
             mat[i].extend(additional)
             #Add the extra rows
-            new_row = [0]*6 + [-1]*6
+            new_row = [0]*6 + [0]*6
             new_row[i] = 1
             mat.append(new_row)
         #Make Diagonal Ones

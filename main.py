@@ -92,6 +92,6 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
     return encoder,last_loss
 
 #Call
-graph = graphs.Benzine()
-encoder,loss = CreateEncoder(graph,output_size=2,similarity_function=similarity.directConnections)
+graph = graphs.DoubleCrossedCycle(12)
+encoder,loss = CreateEncoder(graph,output_size=3,similarity_function=similarity.directConnections)
 display.Plot(graph,encoder)
