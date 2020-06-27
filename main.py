@@ -56,7 +56,7 @@ def latent_distance_loss(output, similarityTensor):
     return loss
 
 #Creater function
-def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=50000):
+def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=10000):
     """
     This will train and return a specified model on a specific graph.
     The encoder will assign nodes vectors in a latent space of a specified dimension (output_size)
@@ -93,5 +93,5 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
 
 #Call
 graph = graphs.Benzine()
-encoder,loss = CreateEncoder(graph,output_size=3,similarity_function=similarity.sharedNeighbors)
+encoder,loss = CreateEncoder(graph,output_size=2,similarity_function=similarity.directConnections)
 display.Plot(graph,encoder)

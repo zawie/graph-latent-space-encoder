@@ -23,7 +23,12 @@ def Display2D(adjacenyMatrix,latentMapping):
             point1 = latentMapping[neigh]
             x_values = [point0[0], point1[0]]
             y_values = [point0[1], point1[1]]
-            plt.plot(x_values, y_values, color='k', alpha=adjacenyMatrix[n][neigh]*.5)
+            c = 'k'
+            a = adjacenyMatrix[n][neigh]*.5
+            if a < 0:
+                a = 0 #abs(a)*.99
+                c = 'r'
+            plt.plot(x_values, y_values, color=c, alpha=a)
     plt.show()
 
 def Display3D(adjacenyMatrix,latentMapping):

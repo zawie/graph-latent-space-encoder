@@ -51,16 +51,24 @@ def Benzine(Hydrogen=True):
     #Create base carbon center
     mat = Cycle(6)
     if Hydrogen:
+        #Make carbons pull towards each other more
+        #This is to motivate hydrogens to be on "outside" of cycle
+        """for i in range(6):
+            for j in range(6):
+                if mat[i][j] == 0:
+                    mat[i][j] = 0.2"""
+        #Add Hydrogens
         for i in range(6):
             #Add Hydrogden to existing rows
-            additional = [0]*6
+            additional = [-1]*6
             additional[i] = 1
             mat[i].extend(additional)
             #Add the extra rows
-            new_row = [0]*12
+            new_row = [0]*6 + [-1]*6
             new_row[i] = 1
             mat.append(new_row)
         #Make Diagonal Ones
         for i in range(12):
             mat[i][i] = 1
+    print(mat)
     return mat
