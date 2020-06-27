@@ -11,6 +11,9 @@ import display
 
 #Encoders
 class SimpleEncoder(nn.Module):
+    """
+    This is a simple encoder with no hidden layers
+    """
     def __init__(self, input_size, output_size):
         super(SimpleEncoder,self).__init__()
         self.input_size = input_size
@@ -24,30 +27,40 @@ class SimpleEncoder(nn.Module):
 
 #Custom Losses
 def latent_orthogonality_loss(output, similarityTensor):
-    #Latent Orthoganlity
+    """
+    This will make more similar nodes more parallel, and more disimilar nodes
+    more orthogonal.
+
+    This is better for capturing information (I think), but not as pretty.
+    """
     outputT = torch.transpose(output,0,1)
     latentOrthogonality = torch.mm(output,outputT)
     loss = torch.mean((latentOrthogonality - similarityTensor)**2)
     return loss
 
 def latent_distance_loss(output, similarityTensor):
-    #Latent Orthoganlity
-    size = output.size()[0]
+    """
+    This will make more similar nodes closer to each other and disimilar nodes
+    farther from each other in the latent space, using Euclidian Distance.
 
+    This is more useful for visualizing.
+    """
+    size = output.size()[0]
     n = output.size(0)
     m = output.size(0)
     d = output.size(1)
-
     x = output.unsqueeze(1).expand(n, m, d)
     y = output.unsqueeze(0).expand(n, m, d)
-
     dist = torch.pow(x - y, 2).sum(2)
-
     loss = torch.mean(((1 - dist) - similarityTensor)**2)
     return loss
 
 #Creater function
 def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similarity.directConnections,output_size=2,max_steps=10000):
+    """
+    This will train and return a specified model on a specific graph.
+    The encoder will assign nodes vectors in a latent space of a specified dimension (output_size)
+    """
     #Generate Similairty Matrix
     similarityTensor = torch.Tensor(similarity.getSimilarityMatrix(adjacenyMatrix,similarity_function))
     #training cycle
@@ -77,6 +90,6 @@ def CreateEncoder(adjacenyMatrix,model=SimpleEncoder,similarity_function=similar
     return encoder
 
 #Call
-graph = graphs.randomGraph(10,weighted=True)
+graph = graphs.randomGraph(10,weighted=False)
 encoder = CreateEncoder(graph,output_size=3,similarity_function=similarity.randomWalk)
 display.Plot(graph,encoder)
